@@ -1,8 +1,0 @@
-subject, block_type, block, thought probe, trial, right_offer, left_offer, offer_right_image, offer_left_image, exp_value_right, exp_value_left, exp_value_chosen, choice_location, choice_key, choice_flower, unchosen_flower, chosen_flower_image, unchosen_flower_image, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, coins
-0, practice, 0, not presented, 1, 3, 2, 2.png, 3.png, 0.65, 0.65, 0.65, right, 2, 3, 2, 2.png, 3.png, 0.35, 0.65, 0.65, 0.35, 0.42773860006127506,1, 1,
-0, practice, 0, presented, 2, 3, 2, 3.png, 2.png, 0.65, 0.65, 0.65, left, 1, 2, 3, 2.png, 3.png, 0.35, 0.65, 0.65, 0.35, 0.39500729995779693,1, 2,
-50,
-0, practice, 0, not presented, 3, 3, 2, 2.png, 1.png, 0.65, 0.35, 0.65, right, 2, 3, 2, 2.png, 1.png, 0.35, 0.65, 0.65, 0.35, 0.4021079000085592,1, 3,
-0, practice, 0, not presented, 4, 3, 2, 1.png, 4.png, 0.35, 0.35, 0.35, right, 2, 3, 2, 1.png, 4.png, 0.35, 0.65, 0.65, 0.35, 0.2987868000054732,0, 3,
-0, practice, 0, presented, 5, 3, 2, 2.png, 1.png, 0.65, 0.35, 0.35, left, 1, 2, 3, 1.png, 2.png, 0.35, 0.65, 0.65, 0.35, 0.21544659999199212,0, 3,
-61,

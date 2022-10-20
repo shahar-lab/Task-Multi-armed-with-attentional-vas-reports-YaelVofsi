@@ -133,7 +133,8 @@ def main():
         outro = visual.ImageStim(win, image="outro.png",  units='norm', size=[2,2], interpolate = True)
         blockCnt = 0
         # Counterbalance block order
-        blockOrder = [ [0,0,0,0,0,0,0,0]]
+        blockOrder = [ [0]] #        blockOrder = [ [0,0,0,0,0,0,0,0]]
+
         # 0 -> delay 7 secs
         # 1 -> delay 1 second
         for x in blockOrder[subject_id]:
@@ -173,8 +174,8 @@ def main():
                     #Event 4 -> Pressing down left button, Event 5 -> Pressing down right button
                         if events.button == 4:
                             break
-        #coinsBox = visual.TextStim(win, text= str(coins), pos=[0,0], color=(0,0,0))
-        #coinsBox.draw()
+        coinsBox = visual.TextStim(win, text= str(coins), pos=[0,0], color=(0,0,0))
+        coinsBox.draw()
         outro.draw()
         win.update()
         while True:
@@ -418,7 +419,6 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
                 if events.button == 4:
                     RT = str(mytimer.getTime())
                     stimL.draw()
-                    stimR.draw()
                     left_rect.draw()
                     fixation.draw()
                     win.update()
@@ -461,7 +461,6 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
                 elif events.button == 5:
                     RT = str(mytimer.getTime())
                     stimR.draw()
-                    stimL.draw()
                     right_rect.draw()
                     fixation.draw()
                     win.update()
