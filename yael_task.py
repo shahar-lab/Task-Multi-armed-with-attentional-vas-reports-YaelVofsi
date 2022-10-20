@@ -45,7 +45,7 @@ question = visual.TextStim(win, (':עגרכ הלטמל ילש בשקה תמר'),
 pressA = visual.TextStim(win, ('הריחבל A ץחל'),color=(-1, -1, -1), colorSpace='rgb',pos=(0,-10))
 vas = Slider(win,
              ticks=(1, 100),
-             labels=('0', '100'),
+             labels=('ללכ בשק אלל'  , 'אלמ בשק'),
              granularity=0,
              color='black',
              fillColor='black',
@@ -60,24 +60,24 @@ vas = Slider(win,
 subject_id = (int(subjectN))%2 # previously x
 flower_set1 = [ "1.png", "2.png", "3.png", "4.png" ]
 flower_set2 = [ "5.png", "6.png", "7.png", "8.png" ] 
-flower_set3 = [ "a.png", "b.png", "c.png", "d.png" ] 
-flower_set4 = [ "e.png", "f.png", "g.png", "h.png" ] 
-flower_set5 = [ "i.png", "j.png", "k.png", "l.png" ] 
-flower_set6 = [ "m.png", "n.png", "o.png", "p.png" ] 
-flower_set7 = [ "q.png", "r.png", "s.png", "t.png" ] 
-flower_set8 = [ "u.png", "v.png", "w.png", "x.png" ] 
-deckList = [ [ "1.png", "2.png", "3.png", "4.png" ], [ "5.png", "6.png", "7.png", "8.png" ] , [ "a.png", "b.png", "c.png", "d.png" ] , [ "e.png", "f.png", "g.png", "h.png" ], [ "i.png", "j.png", "k.png", "l.png" ], ["m.png", "n.png", "o.png", "p.png" ], [ "q.png", "r.png", "s.png", "t.png" ], [ "u.png", "v.png", "w.png", "x.png"] ]
+flower_set3 = [ "9.png", "10.png", "11.png", "12.png" ] 
+flower_set4 = [ "13.png", "14.png", "15.png", "16.png" ] 
+flower_set5 = [ "17.png", "18.png", "19.png", "20.png" ] 
+flower_set6 = [ "21.png", "22.png", "23.png", "24.png" ] 
+flower_set7 = [ "25.png", "26.png", "27.png", "28.png" ] 
+flower_set8 = [ "29.png", "30.png", "31.png", "32.png" ] 
+deckList = [ [ "1.png", "2.png", "3.png", "4.png" ], [ "5.png", "6.png", "7.png", "8.png" ] , [ "9.png", "10.png", "11.png", "12.png" ] , [ "13.png", "14.png", "15.png", "16.png" ], [ "17.png", "18.png", "19.png", "20.png" ], ["21.png", "22.png", "23.png", "24.png" ], [ "25.png", "26.png", "27.png", "28.png" ], [ "29.png", "30.png", "31.png", "32.png"] ]
 deck = [flower_set1, flower_set2, flower_set3, flower_set4, flower_set5, flower_set6, flower_set7, flower_set8]
 picList = sample(deckList, 8)
-
+print(picList)
 
 
 # experiment flow
 def main():
-    instructionsPhase = True
+    instructionsPhase = False
     trainPhase = False
     quizPhase = False
-    gamePhase = False
+    gamePhase = True
     
     # Start Instruction Phase
     if instructionsPhase:
@@ -145,7 +145,16 @@ def main():
                 endBlock = "endBlock" + str(blockCnt) + ".png"
                 start = visual.ImageStim(win, image=startBlock,  units='norm', size=[2,2], interpolate = True)
                 end = visual.ImageStim(win, image=endBlock,  units='norm', size=[2,2], interpolate = True)
+                stim1 = visual.ImageStim(win, image=currSet[0], pos=[-9, -5], size=(4,4))
+                stim2 = visual.ImageStim(win, image=currSet[1], pos=[-3, -5], size=(4,4))
+                stim3 = visual.ImageStim(win, image=currSet[2], pos=[+3, -5], size=(4,4))
+                stim4 = visual.ImageStim(win, image=currSet[3], pos=[+9, -5], size=(4,4))
                 start.draw()
+                stim1.draw()
+                stim2.draw()
+                stim3.draw()
+                stim4.draw()
+
                 win.update()
                 while True:
                     abort(win)
@@ -174,7 +183,16 @@ def main():
                 endBlock = "endblock" + str(blockCnt) + ".png"
                 start = visual.ImageStim(win, image=startBlock,  units='norm', size=[2,2], interpolate = True)
                 end = visual.ImageStim(win, image=endBlock,  units='norm', size=[2,2], interpolate = True)
+                stim1 = visual.ImageStim(win, image=currSet[0], pos=[-9, -5], size=(4,4))
+                stim2 = visual.ImageStim(win, image=currSet[1], pos=[-3, -5], size=(4,4))
+                stim3 = visual.ImageStim(win, image=currSet[2], pos=[+3, -5], size=(4,4))
+                stim4 = visual.ImageStim(win, image=currSet[3], pos=[+9, -5], size=(4,4))
                 start.draw()
+                stim1.draw()
+                stim2.draw()
+                stim3.draw()
+                stim4.draw()
+
                 win.update()
                 # Wait for response to begin block
                 while True:
