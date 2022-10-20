@@ -133,12 +133,10 @@ def main():
         outro = visual.ImageStim(win, image="outro.png",  units='norm', size=[2,2], interpolate = True)
         blockCnt = 0
         # Counterbalance block order
-        blockOrder = [ [0,0,0,0,0,0,0,0], [0,0,0,0,0,0,0,0] ]
+        blockOrder = [ [0,0,0,0,0,0,0,0]]
         # 0 -> delay 7 secs
         # 1 -> delay 1 second
         for x in blockOrder[subject_id]:
-            if (x == 0):
-                #delayCond = "7 seconds"
                 blockCnt = blockCnt + 1
                 currSet = picList[blockCnt-1]
                 startBlock = "startBlock" + str(blockCnt) + ".png"
@@ -173,44 +171,6 @@ def main():
                     events = pygame.event.poll()
                     if (events.type == pygame.JOYBUTTONDOWN):
                     #Event 4 -> Pressing down left button, Event 5 -> Pressing down right button
-                        if events.button == 4:
-                            break
-            if (x == 1):
-                #delayCond = "1 second"
-                blockCnt = blockCnt + 1
-                currSet = picList[blockCnt-1]
-                startBlock = "startblock" + str(blockCnt) + ".png"
-                endBlock = "endblock" + str(blockCnt) + ".png"
-                start = visual.ImageStim(win, image=startBlock,  units='norm', size=[2,2], interpolate = True)
-                end = visual.ImageStim(win, image=endBlock,  units='norm', size=[2,2], interpolate = True)
-                stim1 = visual.ImageStim(win, image=currSet[0], pos=[-9, -5], size=(4,4))
-                stim2 = visual.ImageStim(win, image=currSet[1], pos=[-3, -5], size=(4,4))
-                stim3 = visual.ImageStim(win, image=currSet[2], pos=[+3, -5], size=(4,4))
-                stim4 = visual.ImageStim(win, image=currSet[3], pos=[+9, -5], size=(4,4))
-                start.draw()
-                stim1.draw()
-                stim2.draw()
-                stim3.draw()
-                stim4.draw()
-
-                win.update()
-                # Wait for response to begin block
-                while True:
-                    abort(win)
-                    events = pygame.event.poll()
-                    if (events.type == pygame.JOYBUTTONDOWN):
-                    #Event 4 -> Pressing down left button, Event 5 -> Pressing down right button
-                        if events.button == 4:          
-                            mainExperimentModes(dataFile, blockCnt, subjectN, win, "delayCond", n, 'test', currSet)
-                            break
-                end.draw()
-                win.update()
-                # Wait for response to end block
-                while True:
-                    abort(win)
-                    events = pygame.event.poll()
-                    if (events.type == pygame.JOYBUTTONDOWN):
-                    #Event 4 -> Pressed left Button
                         if events.button == 4:
                             break
         #coinsBox = visual.TextStim(win, text= str(coins), pos=[0,0], color=(0,0,0))
