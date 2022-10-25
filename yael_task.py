@@ -8,6 +8,7 @@ from psychopy.visual.slider import Slider
 
 import pygame
 
+
 # Make a text file to save data
 expInfo = {"subject": "0"}
 dlg = gui.DlgFromDict(expInfo, title="Yael's Flowers Task")
@@ -32,9 +33,10 @@ mytimer = core.Clock()
 
 # number of trials and constant pictures
 from random import sample
-n = 25 # number of trials in each block
+n = 5 # number of trials in each block
 #stim_id = np.zeros(n)
-coins = 0 #global var
+total_coins=0 #global var
+coins = 0     #global var
 won = visual.ImageStim(win, image="rw.png", pos=[0, 0], size=4)
 lost = visual.ImageStim(win, image="ur.png", pos=[0, 0], size=4)
 fixation = visual.TextStim(win, text="+", pos=[0, 0], color=(-1, -1, -1))
@@ -53,8 +55,7 @@ vas = Slider(win,
              startValue=50, 
              labelHeight=None,
              size=(40,1.5))
-#ImageStim(win, image=presented[0], pos=[-6, 0], size=(6,6))
-#coinsBox = visual.TextStim(win, text= str(coins), pos=[0,0], color=(0,0,0))
+
 
 # counterbalance, sets of pictures, and pictures of sets
 subject_id = (int(subjectN))%2 # previously x
@@ -164,8 +165,14 @@ def main():
                         if events.button == 4:
                             mainExperimentModes(dataFile, blockCnt, subjectN, win, "not presented", n, 'test', currSet)
                             break
+                #end block feedback
                 end.draw()
+                coinsBox = visual.TextStim(win, text= str(coins), pos=[0,0], color=(0,0,0))
+                coinsBox.draw()
                 win.update()
+                global total_coins
+                total_coins+=coins
+
                 # Wait for response to end block
                 while True:
                     abort(win)
@@ -174,9 +181,14 @@ def main():
                     #Event 4 -> Pressing down left button, Event 5 -> Pressing down right button
                         if events.button == 4:
                             break
-        coinsBox = visual.TextStim(win, text= str(coins), pos=[0,0], color=(0,0,0))
+        blockend   = visual.ImageStim(win, image="outro.png",  units='norm', size=[2,2], interpolate = True)
+        coinsBox   = visual.TextStim(win, text= str(total_coins), pos=[0,0], color=(0,0,0))
+        blockend.draw()
         coinsBox.draw()
-        outro.draw()
+        #win.update()
+        #coinsBox = visual.TextStim(win, text= str(total_coins), pos=[0,0], color=(0,0,0))
+        #coinsBox.draw()
+        #outro.draw()
         win.update()
         while True:
                     abort(win)
@@ -326,7 +338,10 @@ def quizFunc():
                         break
 
 def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockType, currSet):
+    global coins
     coins = 0
+
+    
     #delay_time = 0
     for i in range(1,5):
             if i==1:
@@ -472,33 +487,7 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
                     curr_prob = prob1
                     key = 2
                     stimapr = "right"
-                    dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s," 
-                        % (
-                            subjectN,
-                            blockType,
-                            blockCnt,
-                            cond,
-                            t,
-                            str(stim_id),
-                            str(other_id),
-                            presented[1],
-                            presented[0],
-                            prob1,
-                            prob2,
-                            prob1,
-                            stimapr,
-                            key,
-                            str(stim_id),
-                            str(other_id),
-                            presented[1],
-                            presented[0],
-                            card_1_prob,
-                            card_2_prob, 
-                            card_3_prob, 
-                            card_4_prob,
-                            RT,
-                        )
-                    )       
+                    
                     break           
     
         ##########################################
@@ -511,13 +500,16 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
         if (random() < curr_prob):
             won.draw()
             coins = coins + 1
-            dataFile.write("%i, %i,\n" % (1,coins,))
+            reward = 1
+            #dataFile.write("%i, %i,\n" % (1,coins,))
         else:
             lost.draw()
-            dataFile.write("%i, %i,\n" % (0,coins,))
+            reward = 0
+            #dataFile.write("%i, %i,\n" % (0,coins,))
         win.update()
         core.wait(2)
-        # present thought probe
+        
+        #### present thought probe-------------------------------------
         if (possibleOrder[block_id][t-1] == 1):          
             vas.draw()
             question.draw()
@@ -547,10 +539,47 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
                         pressA.draw()
                         vas.draw()
                         win.update()
-                        dataFile.write("%i,\n" % (coordinates,))
+                        #dataFile.write("%i,\n" % (coordinates,))
+                        
                         core.wait(1)
 
                         break
+    
+    #Save data --------------------------------------------------------------------------------------
+    dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s" 
+                        % (
+                            subjectN,
+                            blockType,
+                            blockCnt,
+                            cond,
+                            t,
+                            str(stim_id),
+                            str(other_id),
+                            presented[1],
+                            presented[0],
+                            prob1,
+                            prob2,
+                            prob1,
+                            stimapr,
+                            key,
+                            str(stim_id),
+                            str(other_id),
+                            presented[1],
+                            presented[0],
+                            card_1_prob,
+                            card_2_prob, 
+                            card_3_prob, 
+                            card_4_prob,
+                            RT,
+                            reward,
+                            #coordinates,
+                            #coins,
+                            #total_coins,
+                        )
+                    ) 
+    dataFile.write("%i, %i,\n" % (0,coins,))      
+
+
                     
     
 
