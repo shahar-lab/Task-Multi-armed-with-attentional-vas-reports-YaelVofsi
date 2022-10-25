@@ -5,21 +5,20 @@ import pygame, time, ctypes
 import numpy as np
 from numpy.random import random
 from psychopy.visual.slider import Slider
-
 import pygame
 
 
-# Make a text file to save data
+#### Make a text file to save data ---------------------------------------
 expInfo = {"subject": "0"}
 dlg = gui.DlgFromDict(expInfo, title="Yael's Flowers Task")
 fileName = "flowers_task_" + expInfo["subject"] + "_" + data.getDateStr()
 dataFile = open(
     fileName + ".csv", "w"
 )  # a simple text file with 'comma-separated-values'
-dataFile.write("subject, block_type, block, thought probe, trial, right_offer, left_offer, offer_right_image, offer_left_image, exp_value_right, exp_value_left, exp_value_chosen, choice_location, choice_key, choice_flower, unchosen_flower, chosen_flower_image, unchosen_flower_image, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, coins\n")
+dataFile.write("subject, block_type, block, thought probe, trial, chosen, unchosen, offer_right_image, offer_left_image, exp_value_right, exp_value_left, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, coins, total_coins\n")
 subjectN = expInfo["subject"]
-# choice_key = 1 -> left, choice_key = 2 -> right
-#initializing game
+
+####initializing game -----------------------------------------
 pygame.init()
 clock = pygame.time.Clock()
 keepPlaying = True
@@ -33,19 +32,26 @@ mytimer = core.Clock()
 
 # number of trials and constant pictures
 from random import sample
-n = 5 # number of trials in each block
-#stim_id = np.zeros(n)
-total_coins=0 #global var
-coins = 0     #global var
-won = visual.ImageStim(win, image="rw.png", pos=[0, 0], size=4)
-lost = visual.ImageStim(win, image="ur.png", pos=[0, 0], size=4)
-fixation = visual.TextStim(win, text="+", pos=[0, 0], color=(-1, -1, -1))
-hourglass = visual.ImageStim(win, image="hourglass.png", pos=[0,0], size=4)
-left_rect = visual.Rect(win, size = (6,7), lineColor=(-1, -1, -1), pos= [-6,0])
+
+
+
+####set global var--------------
+total_coins = 0 
+coins       = 0     
+coordinates =-9999
+n           = 5 # number of trials in each block
+
+
+####set stimuli--------------
+won        = visual.ImageStim(win, image="rw.png", pos=[0, 0], size=4)
+lost       = visual.ImageStim(win, image="ur.png", pos=[0, 0], size=4)
+fixation   = visual.TextStim(win, text="+", pos=[0, 0], color=(-1, -1, -1))
+hourglass  = visual.ImageStim(win, image="hourglass.png", pos=[0,0], size=4)
+left_rect  = visual.Rect(win, size = (6,7), lineColor=(-1, -1, -1), pos= [-6,0])
 right_rect = visual.Rect(win, size = (6,7), lineColor=(-1, -1, -1), pos= [6,0])
-question = visual.TextStim(win, (':עגרכ הלטמל ילש בשקה תמר'),color=(-1, -1, -1), colorSpace='rgb',pos=(0,10))
-pressA = visual.TextStim(win, ('הריחבל A ץחל'),color=(-1, -1, -1), colorSpace='rgb',pos=(0,-10))
-vas = Slider(win,
+question   = visual.TextStim(win, (':עגרכ הלטמל ילש בשקה תמר'),color=(-1, -1, -1), colorSpace='rgb',pos=(0,10))
+pressA     = visual.TextStim(win, ('הריחבל A ץחל'),color=(-1, -1, -1), colorSpace='rgb',pos=(0,-10))
+vas        = Slider(win,
              ticks=(1, 100),
              labels=('ללכ בשק אלל'  , 'אלמ בשק'),
              granularity=0,
@@ -57,7 +63,7 @@ vas = Slider(win,
              size=(40,1.5))
 
 
-# counterbalance, sets of pictures, and pictures of sets
+#### set counterbalance and images ------------------------
 subject_id = (int(subjectN))%2 # previously x
 flower_set1 = [ "1.png", "2.png", "3.png", "4.png" ]
 flower_set2 = [ "5.png", "6.png", "7.png", "8.png" ] 
@@ -67,9 +73,9 @@ flower_set5 = [ "17.png", "18.png", "19.png", "20.png" ]
 flower_set6 = [ "21.png", "22.png", "23.png", "24.png" ] 
 flower_set7 = [ "25.png", "26.png", "27.png", "28.png" ] 
 flower_set8 = [ "29.png", "30.png", "31.png", "32.png" ] 
-deckList = [ [ "1.png", "2.png", "3.png", "4.png" ], [ "5.png", "6.png", "7.png", "8.png" ] , [ "9.png", "10.png", "11.png", "12.png" ] , [ "13.png", "14.png", "15.png", "16.png" ], [ "17.png", "18.png", "19.png", "20.png" ], ["21.png", "22.png", "23.png", "24.png" ], [ "25.png", "26.png", "27.png", "28.png" ], [ "29.png", "30.png", "31.png", "32.png"] ]
+deckList = [ [ "1.png", "2.png", "3.png", "4.png" ]]#, [ "5.png", "6.png", "7.png", "8.png" ] , [ "9.png", "10.png", "11.png", "12.png" ] , [ "13.png", "14.png", "15.png", "16.png" ], [ "17.png", "18.png", "19.png", "20.png" ], ["21.png", "22.png", "23.png", "24.png" ], [ "25.png", "26.png", "27.png", "28.png" ], [ "29.png", "30.png", "31.png", "32.png"] ]
 deck = [flower_set1, flower_set2, flower_set3, flower_set4, flower_set5, flower_set6, flower_set7, flower_set8]
-picList = sample(deckList, 8)
+picList = sample(deckList, 1)
 print(picList)
 
 
@@ -165,7 +171,8 @@ def main():
                         if events.button == 4:
                             mainExperimentModes(dataFile, blockCnt, subjectN, win, "not presented", n, 'test', currSet)
                             break
-                #end block feedback
+####end block feedback--------------
+                #draw end block screen
                 end.draw()
                 coinsBox = visual.TextStim(win, text= str(coins), pos=[0,0], color=(0,0,0))
                 coinsBox.draw()
@@ -173,7 +180,7 @@ def main():
                 global total_coins
                 total_coins+=coins
 
-                # Wait for response to end block
+                # wait for response to end block
                 while True:
                     abort(win)
                     events = pygame.event.poll()
@@ -181,14 +188,12 @@ def main():
                     #Event 4 -> Pressing down left button, Event 5 -> Pressing down right button
                         if events.button == 4:
                             break
+####end task feedback-----------------------
         blockend   = visual.ImageStim(win, image="outro.png",  units='norm', size=[2,2], interpolate = True)
         coinsBox   = visual.TextStim(win, text= str(total_coins), pos=[0,0], color=(0,0,0))
         blockend.draw()
         coinsBox.draw()
-        #win.update()
-        #coinsBox = visual.TextStim(win, text= str(total_coins), pos=[0,0], color=(0,0,0))
-        #coinsBox.draw()
-        #outro.draw()
+
         win.update()
         while True:
                     abort(win)
@@ -365,6 +370,8 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
     j.init()
     possibleOrder = [[0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1], [0,0,1,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,1]]
     block_id = blockCnt%2
+
+    ##### TRIAL LOOP -----------------------------------------
     for t in range(1, trials+1):
         if (possibleOrder[block_id][t-1] == 1):
             cond = "presented"
@@ -404,8 +411,11 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
         stimR.draw()
         win.update()
         mytimer.reset(0)
+        
+        ####RESPONSE ---------------------------------------
         while True:
             abort(win)
+            #### RESPONSE TIMEOUT ----------------------------------------------------------------
             if (mytimer.getTime() > 6):
                 # skip trial
                 stimapr = "None"
@@ -429,6 +439,8 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
                             break
                 break
             events = pygame.event.poll()
+
+            ##### COLLECT RESPONSE ------------------------------------------------------------------
             if (events.type == pygame.JOYBUTTONDOWN):
                 # event 4 -> Pressing down left button, Event 5 -> Pressing down right button
                 if events.button == 4:
@@ -445,33 +457,6 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
                     curr_prob = prob2
                     key = 1
                     stimapr = "left"
-                    dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s," 
-                        % (
-                            subjectN,
-                            blockType,
-                            blockCnt,
-                            cond,
-                            t,
-                            str(other_id),
-                            str(stim_id),
-                            presented[1],
-                            presented[0],
-                            prob1,
-                            prob2,
-                            prob2,
-                            stimapr,
-                            key,
-                            str(stim_id),
-                            str(other_id),
-                            presented[0],
-                            presented[1],
-                            card_1_prob,
-                            card_2_prob, 
-                            card_3_prob, 
-                            card_4_prob,
-                            RT,
-                        )
-                    )
                     break
                 elif events.button == 5:
                     RT = str(mytimer.getTime())
@@ -490,9 +475,9 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
                     
                     break           
     
-        ##########################################
-        # outcome using Random Walk for n trials #
-        ##########################################
+        
+        
+        #### OUTCOME -------------------------------------
         if (stimapr == "left"):
             stimL.draw()
         if (stimapr == "right"):
@@ -501,15 +486,13 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
             won.draw()
             coins = coins + 1
             reward = 1
-            #dataFile.write("%i, %i,\n" % (1,coins,))
         else:
             lost.draw()
             reward = 0
-            #dataFile.write("%i, %i,\n" % (0,coins,))
         win.update()
         core.wait(2)
         
-        #### present thought probe-------------------------------------
+        #### THOUGHT PROBEe-------------------------------------
         if (possibleOrder[block_id][t-1] == 1):          
             vas.draw()
             question.draw()
@@ -524,7 +507,6 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
                 if (x>100): x=100
                 if (x<1): x=1
                 #print circles according to the joystick, adjusted with the screen size    
-                print(x)       
                 vas.markerPos=(x)
                 vas.draw()
                 question.draw()
@@ -538,46 +520,74 @@ def mainExperimentModes(dataFile, blockCnt, subjectN, win, cond, trials, blockTy
                         question.draw()
                         pressA.draw()
                         vas.draw()
-                        win.update()
-                        #dataFile.write("%i,\n" % (coordinates,))
-                        
+                        win.update()                       
                         core.wait(1)
 
                         break
+
+        else:
+            coordinates=-9999
+            
+
+
     
     #Save data --------------------------------------------------------------------------------------
-    dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s" 
+        #save a thought probe trial
+        if (possibleOrder[block_id][t-1] == 1): 
+            print('happy')
+            dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %f, %f, %f\n" 
                         % (
                             subjectN,
                             blockType,
                             blockCnt,
                             cond,
                             t,
-                            str(stim_id),
-                            str(other_id),
+                            '',  
+                            '', 
+                            '',
+                            '',
+                            '',
+                            '',
+                            '', 
+                            '', 
+                            '',
+                            '', 
+                            '', 
+                            '',
+                            '',
+                            reward,
+                            coordinates,
+                            coins,
+                            total_coins
+                        )
+                    ) 
+        else:
+            dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %f, %f, %f\n" 
+                        % (
+                            subjectN,
+                            blockType,
+                            blockCnt,
+                            cond,
+                            t,
+                            str(stim_id),  #chosen
+                            str(other_id), #unchosen
                             presented[1],
                             presented[0],
                             prob1,
                             prob2,
-                            prob1,
-                            stimapr,
-                            key,
-                            str(stim_id),
-                            str(other_id),
-                            presented[1],
-                            presented[0],
+                            stimapr, #chosen side
+                            key,     #selected key
                             card_1_prob,
                             card_2_prob, 
                             card_3_prob, 
                             card_4_prob,
                             RT,
                             reward,
-                            #coordinates,
-                            #coins,
-                            #total_coins,
+                            coordinates,
+                            coins,
+                            total_coins
                         )
                     ) 
-    dataFile.write("%i, %i,\n" % (0,coins,))      
 
 
                     
