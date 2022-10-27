@@ -19,16 +19,16 @@ fileName = "flowers_task_" + expInfo["subject"] + "_" + data.getDateStr()
 dataFile = open(
     fileName + ".csv", "w"
 )  # a simple text file with 'comma-separated-values'
-dataFile.write("subject, block_type, block, thought probe, trial, chosen, unchosen, offer_right_image, offer_left_image, exp_value_right, exp_value_left, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, coins, total_coins, ntrial_to_prob, count_to_prob\n")
+dataFile.write("subject, block_type, block, thought probe, trial, chosen, unchosen, offer_right_image, offer_left_image, exp_value_right, exp_value_left, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, coins_per_block, coins_per_task, ntrial_to_prob, count_to_prob\n")
 subjectN = expInfo["subject"]
 
 
 ####initializing game -----------------------------------------
 #xbox controller
 pygame.init()
-clock = pygame.time.Clock()
+clock       = pygame.time.Clock()
 keepPlaying = True
-j = pygame.joystick.Joystick(0)
+j           = pygame.joystick.Joystick(0)
 j.init()
 
 # create a window
@@ -39,23 +39,22 @@ mytimer = core.Clock()
 ####set global var--------------
 
 # number of trials in each block
-Ntrials     = 5 
-Nblocks     = 1
+Ntrials     = 2 
+Nblocks     = 8
 
 #reward probabilities
 arms_prob   =[0.35,0.45,0.55,0.65]
 
-
 #change to True/False to include section in the next run
 instructionsPhase = False
-trainPhase        = False
+trainPhase        = True
 quizPhase         = False
 gamePhase         = True
 
 #additional vars
-total_coins = 0 
-coins       = 0     
-coordinates =-9999
+coins_per_task  = 0 
+coins_per_block = 0     
+coordinates     =-9999
 
 ####set stimuli--------------
 won        = visual.ImageStim(win, image="rw.png", pos=[0, 0], size=4)
@@ -80,18 +79,16 @@ vas        = Slider(win,
 
 #### set counterbalance and images ------------------------
 subject_id = (int(subjectN))%2 # previously x
-flower_set1 = [ "1.png", "2.png", "3.png", "4.png" ]
-#flower_set2 = [ "5.png", "6.png", "7.png", "8.png" ] 
-#flower_set3 = [ "9.png", "10.png", "11.png", "12.png" ] 
-#flower_set4 = [ "13.png", "14.png", "15.png", "16.png" ] 
-#flower_set5 = [ "17.png", "18.png", "19.png", "20.png" ] 
-#flower_set6 = [ "21.png", "22.png", "23.png", "24.png" ] 
-#flower_set7 = [ "25.png", "26.png", "27.png", "28.png" ] 
-#flower_set8 = [ "29.png", "30.png", "31.png", "32.png" ] 
-#deckList = [ [ "1.png", "2.png", "3.png", "4.png" ]]#, [ "5.png", "6.png", "7.png", "8.png" ] , [ "9.png", "10.png", "11.png", "12.png" ] , [ "13.png", "14.png", "15.png", "16.png" ], [ "17.png", "18.png", "19.png", "20.png" ], ["21.png", "22.png", "23.png", "24.png" ], [ "25.png", "26.png", "27.png", "28.png" ], [ "29.png", "30.png", "31.png", "32.png"] ]
+training_image_set = [ "practice_1.png", "practice_2.png", "practice_3.png", "practice_4.png" ]
 
 picList = sample([ [ "1.png", "2.png", "3.png", "4.png" ],
-                   [ "5.png", "6.png", "7.png", "8.png" ] ], Nblocks)
+                   [ "5.png", "6.png", "7.png", "8.png" ] ,
+                   [ "9.png", "10.png", "11.png", "12.png" ] , 
+                   [ "13.png", "14.png", "15.png", "16.png" ], 
+                   [ "17.png", "18.png", "19.png", "20.png" ], 
+                   ["21.png", "22.png", "23.png", "24.png" ], 
+                   [ "25.png", "26.png", "27.png", "28.png" ], 
+                   [ "29.png", "30.png", "31.png", "32.png"] ], Nblocks)
 
 
 # experiment flow
@@ -123,9 +120,18 @@ def main():
 
 #### Training -----------------------------
     if trainPhase:
-        current_block = 0
+        
+        current_block  = 0
         training_intro = visual.ImageStim(win, image="train1.png",  units='norm', size=[2,2], interpolate = True)
+        stim1       = visual.ImageStim(win, image=training_image_set[0], pos=[-9, -5], size=(4,4))
+        stim2       = visual.ImageStim(win, image=training_image_set[1], pos=[-3, -5], size=(4,4))
+        stim3       = visual.ImageStim(win, image=training_image_set[2], pos=[+3, -5], size=(4,4))
+        stim4       = visual.ImageStim(win, image=training_image_set[3], pos=[+9, -5], size=(4,4))
         training_intro.draw()
+        stim1.draw()
+        stim2.draw()
+        stim3.draw()
+        stim4.draw()
         win.update()
         while True:
             abort(win)
@@ -133,8 +139,8 @@ def main():
             if (events.type == pygame.JOYBUTTONDOWN):
                 #Event 4 -> Pressing down left button, Event 5 -> Pressing down right button
                 if events.button == 4:
-                    #delayCond = "1 second"
-                    mainExperimentModes(dataFile, current_block, subjectN, win, "not presented" , 5, 'practice', flower_set1) # practice without thought probe
+            
+                    mainExperimentModes(dataFile, current_block, subjectN, win, "not presented", 6, 'test', training_image_set)
                     end_training = visual.ImageStim(win, image="end_training.png",  units='norm', size=[2,2], interpolate = True)
                     end_training.draw()
                     win.update()
@@ -164,7 +170,7 @@ def main():
                 #set stim images for current block
                 currSet = picList[current_block]
 
-                #block instructions screes
+                #block instructions screen
                 startBlock  = "startBlock" + str(current_block+1) + ".png"
                 endBlock    = "endBlock" + str(current_block+1) + ".png"
                 start       = visual.ImageStim(win, image=startBlock,  units='norm', size=[2,2], interpolate = True)
@@ -193,11 +199,10 @@ def main():
 ####end block feedback--------------
                 #draw end block screen
                 end.draw()
-                coinsBox = visual.TextStim(win, text= str(coins), pos=[0,0], color=(0,0,0))
+                coinsBox = visual.TextStim(win, text= str(coins_per_block), pos=[0,0], color=(0,0,0))
                 coinsBox.draw()
                 win.update()
-                global total_coins
-                total_coins+=coins
+
 
                 # wait for response to end block
                 while True:
@@ -209,7 +214,7 @@ def main():
                             break
 ####end task feedback-----------------------
         blockend   = visual.ImageStim(win, image="outro.png",  units='norm', size=[2,2], interpolate = True)
-        coinsBox   = visual.TextStim(win, text= str(total_coins), pos=[0,0], color=(0,0,0))
+        coinsBox   = visual.TextStim(win, text= str(coins_per_task), pos=[0,0], color=(0,0,0))
         blockend.draw()
         coinsBox.draw()
 
@@ -366,12 +371,17 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
     ####first trial initial vars ----------------
     
     #amount of rewards
-    global coins
-    coins = 0
+    global coins_per_block    
+    global coins_per_task
+
+    coins_per_block = 0
+    coins_per_task+=coins_per_block
 
     #amount of trials to first thought probe
     ntrials_to_prob=random.randrange(2, 3)
     count_to_prob  =1
+
+
 
 
     ##### TRIAL LOOP -----------------------------------------
@@ -481,8 +491,9 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
             stimR.draw()
         if (random.random() < prob_chosen):
             won.draw()
-            coins = coins + 1
-            reward = 1
+            coins_per_block+= 1
+            coins_per_task += 1
+            reward          = 1
         else:
             lost.draw()
             reward = 0
@@ -491,7 +502,8 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
         
 
         #### THOUGHT PROBE-------------------------------------
-        if (count_to_prob==ntrials_to_prob):          
+        if (count_to_prob==ntrials_to_prob):   
+            cond = 'probe'       
             vas.draw()
             question.draw()
             pressA.draw()
@@ -527,6 +539,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                         break
 
         else:
+            cond = 'no_probe'       
             coordinates    =-9999
     
             
@@ -540,7 +553,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                         % (
                             subjectN,
                             blockType,
-                            current_block,
+                            current_block+1,
                             cond,
                             t,
                             chosen+1,  
@@ -558,8 +571,8 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                             RT,
                             reward,
                             coordinates,
-                            coins,
-                            total_coins,
+                            coins_per_block,
+                            coins_per_task,
                             count_to_prob,
                             ntrials_to_prob
                         )
