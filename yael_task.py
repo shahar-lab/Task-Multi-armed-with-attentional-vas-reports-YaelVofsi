@@ -387,7 +387,6 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
     ##### TRIAL LOOP -----------------------------------------
 
     for t in range(1, trials+1):
-        RTwarning = False
         mytimer = core.Clock()
         
         #### STIMULI--------------
@@ -508,6 +507,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
             question.draw()
             pressA.draw()
             win.flip()
+            mytimer.reset(0)
             x=50
             while True:
                 events = pygame.event.poll()
@@ -527,6 +527,8 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                 #check to see if the button 'A' in the controller was pressed to stop the program    
                 if(events.type == pygame.JOYBUTTONDOWN):
                     if(events.button == 0):
+                        RT_vas = str(mytimer.getTime())
+
                         coordinates = x
                         vas.markerPos=(x)
                         question.draw()
@@ -541,6 +543,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
         else:
             cond = 'no_probe'       
             coordinates    =-9999
+            RT_vas = -9999
     
             
 
