@@ -1,0 +1,5 @@
+subject, block_type, block, thought probe, trial, chosen, unchosen, offer_right_image, offer_left_image, exp_value_right, exp_value_left, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, coins_per_block, coins_per_task, ntrial_to_prob, count_to_prob, RT_vas
+0, test, 1, no_probe, 1, 2, 4, 2, 4, 0.45, 0.65, left, 1, 0.35, 0.45, 0.55, 0.65, 0.3347688999492675, 1, -9999.000000, 1.000000, 1.000000, 1.000000, 2.000000,-9999.000000
+0, test, 1, probe, 2, 2, 1, 2, 1, 0.45, 0.35, left, 1, 0.35, 0.45, 0.55, 0.65, 0.2953030997887254, 1, 50.000000, 2.000000, 2.000000, 2.000000, 2.000000,100.000000
+0, test, 1, no_probe, 3, 3, 4, 3, 4, 0.55, 0.65, left, 1, 0.35, 0.45, 0.55, 0.65, 0.16539909993298352, 1, -9999.000000, 3.000000, 3.000000, 1.000000, 3.000000,-9999.000000
+0, test, 1, no_probe, 4, 3, 1, 3, 1, 0.55, 0.35, left, 1, 0.35, 0.45, 0.55, 0.65, 0.08130399999208748, 0, -9999.000000, 3.000000, 3.000000, 2.000000, 3.000000,-9999.000000

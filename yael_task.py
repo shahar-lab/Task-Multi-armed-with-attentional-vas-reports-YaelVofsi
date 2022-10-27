@@ -19,7 +19,7 @@ fileName = "flowers_task_" + expInfo["subject"] + "_" + data.getDateStr()
 dataFile = open(
     fileName + ".csv", "w"
 )  # a simple text file with 'comma-separated-values'
-dataFile.write("subject, block_type, block, thought probe, trial, chosen, unchosen, offer_right_image, offer_left_image, exp_value_right, exp_value_left, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, coins_per_block, coins_per_task, ntrial_to_prob, count_to_prob\n")
+dataFile.write("subject, block_type, block, thought probe, trial, chosen, unchosen, offer_right_image, offer_left_image, exp_value_right, exp_value_left, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, RT_vas, coins_per_block, coins_per_task, ntrial_to_prob, count_to_prob\n")
 subjectN = expInfo["subject"]
 
 
@@ -39,15 +39,15 @@ mytimer = core.Clock()
 ####set global var--------------
 
 # number of trials in each block
-Ntrials     = 2 
-Nblocks     = 8
+Ntrials     = 10 
+Nblocks     = 1
 
 #reward probabilities
 arms_prob   =[0.35,0.45,0.55,0.65]
 
 #change to True/False to include section in the next run
 instructionsPhase = False
-trainPhase        = True
+trainPhase        = False
 quizPhase         = False
 gamePhase         = True
 
@@ -527,8 +527,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                 #check to see if the button 'A' in the controller was pressed to stop the program    
                 if(events.type == pygame.JOYBUTTONDOWN):
                     if(events.button == 0):
-                        RT_vas = str(mytimer.getTime())
-
+                        RT_vas = mytimer.getTime()
                         coordinates = x
                         vas.markerPos=(x)
                         question.draw()
@@ -552,7 +551,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
     #Save data --------------------------------------------------------------------------------------
 
         #save a line with choice-outcome data
-        dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %f, %f, %f, %f, %f\n" 
+        dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %f, %f, %f, %f, %f,%f\n" 
                         % (
                             subjectN,
                             blockType,
@@ -565,8 +564,8 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                             offer[1]+1,
                             prob_chosen,
                             prob_unchosen,
-                            stimapr, #chosen side
-                            key,     #selected key
+                            stimapr, 
+                            key,     
                             arms_prob[0],
                             arms_prob[1], 
                             arms_prob[2], 
@@ -574,10 +573,11 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                             RT,
                             reward,
                             coordinates,
+                            RT_vas,
                             coins_per_block,
                             coins_per_task,
                             count_to_prob,
-                            ntrials_to_prob
+                            ntrials_to_prob                            
                         )
                     )
         #save a thought probe trial
