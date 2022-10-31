@@ -12,6 +12,38 @@ from random import sample
 import random
 
 
+################################################################################################################
+####set experiment configuration --------------
+
+# number of trials and blocks
+Ntrials          = 3
+Nblocks          = 2
+
+#timing in the trial
+trial_timing =  {
+  "ITI": [1],
+  "choice_feedback": [0.5],
+  "outcome": [1]
+}
+
+
+#reward probabilities
+arms_prob   =[0.35,0.45,0.55,0.65]
+
+
+#change to True/False to include section in the next run
+instructionsPhase = False
+quizPhase         = False
+trainPhase        = False
+gamePhase         = True
+############################################################################################################
+
+
+
+
+
+
+
 #### Make a text file to save data ---------------------------------------
 expInfo  = {"subject": "0"}
 dlg      = gui.DlgFromDict(expInfo, title="Yael's Flowers Task")
@@ -36,25 +68,7 @@ win     = visual.Window( [1920, 1080], fullscr = True, monitor="testMonitor", un
 win.mouseVisible = False
 mytimer = core.Clock()
 
-####set global var--------------
 
-# number of trials in each block
-Ntrials     = 10 
-Nblocks     = 1
-
-#reward probabilities
-arms_prob   =[0.35,0.45,0.55,0.65]
-
-#change to True/False to include section in the next run
-instructionsPhase = False
-trainPhase        = False
-quizPhase         = False
-gamePhase         = True
-
-#additional vars
-coins_per_task  = 0 
-coins_per_block = 0     
-coordinates     =-9999
 
 ####set stimuli--------------
 won        = visual.ImageStim(win, image="rw.png", pos=[0, 0], size=4)
@@ -76,9 +90,12 @@ vas        = Slider(win,
              labelHeight=None,
              size=(40,1.5))
 
+#additional vars
+coins_per_task  = 0 
+coins_per_block = 0     
+coordinates     =-9999
 
 #### set counterbalance and images ------------------------
-subject_id = (int(subjectN))%2 # previously x
 training_image_set = [ "practice_1.png", "practice_2.png", "practice_3.png", "practice_4.png" ]
 
 picList = sample([ [ "1.png", "2.png", "3.png", "4.png" ],
@@ -140,7 +157,7 @@ def main():
                 #Event 4 -> Pressing down left button, Event 5 -> Pressing down right button
                 if events.button == 4:
             
-                    mainExperimentModes(dataFile, current_block, subjectN, win, "not presented", 6, 'test', training_image_set)
+                    mainExperimentModes(dataFile, current_block, subjectN, win, "not presented", 6, 'test', training_image_set,trial_timing)
                     end_training = visual.ImageStim(win, image="end_training.png",  units='norm', size=[2,2], interpolate = True)
                     end_training.draw()
                     win.update()
@@ -194,7 +211,7 @@ def main():
                     #Event 4 -> Pressing down left button, Event 5 -> Pressing down right button
                         if events.button == 4:
                             ####MAIN TRIALS LOOP
-                            mainExperimentModes(dataFile, current_block, subjectN, win, "not presented", Ntrials, 'test', currSet)
+                            mainExperimentModes(dataFile, current_block, subjectN, win, "not presented", Ntrials, 'test', currSet,trial_timing)
                             break
 ####end block feedback--------------
                 #draw end block screen
@@ -366,7 +383,7 @@ def quizFunc():
                         nTest = 1                        
                         break
 
-def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, blockType, currSet):
+def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, blockType, currSet,trial_timing):
     
     ####first trial initial vars ----------------
     
@@ -390,16 +407,16 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
         mytimer = core.Clock()
         
         #### STIMULI--------------
-        offer = sample(range(4),2)
-        stimL = visual.ImageStim(win, image=currSet[offer[0]], pos=[-6, 0], size=(6,6))
-        stimR = visual.ImageStim(win, image=currSet[offer[1]], pos=[6, 0], size=(6,6))
         
         #fixation
         fixation.draw()
         win.update()
-        core.wait(1)
-        
+        core.wait(trial_timing['ITI'][0])
+
         #target
+        offer = sample(range(4),2)
+        stimL = visual.ImageStim(win, image=currSet[offer[0]], pos=[-6, 0], size=(6,6))
+        stimR = visual.ImageStim(win, image=currSet[offer[1]], pos=[6, 0], size=(6,6))
         fixation.draw()
         stimL.draw()
         stimR.draw()
@@ -409,19 +426,24 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
         ####RESPONSE ---------------------------------------
         while True:
             abort(win)
+            
             #### RESPONSE TIMEOUT ----------------------------------------------------------------
             if (mytimer.getTime() > 6):
                 # skip trial
                 stimapr = "None"
                 rt_warning = visual.TextStim(win, text= " רתוי רהמ ביגהל שי", pos=[0,0], color=(-1,-1,-1)) # יש להגיב מהר יותר
+                rt_warning2 = visual.TextStim(win, text= "ךשמהל אוהשלכ שקמ לע ץוחלל שי", pos=[0,-10], color=(-1,-1,-1)) # יש ללחוץ על מקש כלשהוא להמשך
                 rt_warning.draw()
+                rt_warning2.draw()
+
+
                 win.update()
                 dataFile.write("%s, %s, %s, %s, %s, %s,"
                     % (
                         subjectN, 
                         blockType,
                         current_block, 
-                        cond,
+                        [],
                         t,
                         "NULL",
                     ))
@@ -429,7 +451,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                     events = pygame.event.poll()
                     if (events.type == pygame.JOYBUTTONDOWN):
                         # event 4 -> pressing down left button
-                        if (events.button == 4):
+                        if (events.button == 4 | events.button == 5):
                             break
                 break
             events = pygame.event.poll()
@@ -442,13 +464,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
 
                     RT = str(mytimer.getTime())
 
-                    #choice feedback screen
                     stimL.draw()
-                    left_rect.draw()
-                    fixation.draw()
-                    win.update()
-                    core.wait(0.5)
-
 
                     #save vars
                     prob_chosen     = arms_prob[offer[0]] # left flower prob 
@@ -462,16 +478,11 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                 
                 #sub pressed RIGHT
                 elif events.button == 5: 
+                    
                     RT = str(mytimer.getTime())
 
-                    #choice feedback screen
                     stimR.draw()
-                    right_rect.draw()
-                    fixation.draw()
-                    win.update()
-                    core.wait(0.5)
-
-
+ 
                     #save vars
                     prob_chosen     = arms_prob[offer[1]] # right flower prob 
                     prob_unchosen   = arms_prob[offer[0]] # left flower prob
@@ -481,7 +492,10 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                     stimapr         = "right"
                     break           
     
-        
+                #choice feedback screen (choice was drawen above)
+                fixation.draw()
+                win.update()
+                core.wait(trial_timing['choice_feedback'][0])
         
         #### OUTCOME -------------------------------------
         if (stimapr == "left"):
@@ -497,7 +511,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
             lost.draw()
             reward = 0
         win.update()
-        core.wait(2)
+        core.wait(trial_timing['outcome'][0])
         
 
         #### THOUGHT PROBE-------------------------------------
