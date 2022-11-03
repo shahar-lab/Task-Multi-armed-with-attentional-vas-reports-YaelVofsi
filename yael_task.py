@@ -22,6 +22,7 @@ Nblocks          = 2
 #timing in the trial
 trial_timing =  {
   "ITI": [1],
+  "RT_deadline": [6],
   "choice_feedback": [0.5],
   "outcome": [1]
 }
@@ -51,7 +52,7 @@ fileName = "flowers_task_" + expInfo["subject"] + "_" + data.getDateStr()
 dataFile = open(
     fileName + ".csv", "w"
 )  # a simple text file with 'comma-separated-values'
-dataFile.write("subject, block_type, block, thought probe, trial, chosen, unchosen, offer_right_image, offer_left_image, exp_value_right, exp_value_left, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, RT_vas, coins_per_block, coins_per_task, ntrial_to_prob, count_to_prob\n")
+dataFile.write("subject, block_type, block, thought probe, trial, chosen, unchosen, offer_right_image, offer_left_image, exp_value_right, exp_value_left, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, RT_vas, coins_per_block, coins_per_task, ntrial_to_prob, count_to_prob,ITI_duration,RT_deadline,choice_feedback_duration,outcome_duration\n")
 subjectN = expInfo["subject"]
 
 
@@ -405,7 +406,8 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
 
     for t in range(1, trials+1):
         mytimer = core.Clock()
-        
+        abort_trial= False
+
         #### STIMULI--------------
         
         #fixation
@@ -428,35 +430,26 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
             abort(win)
             
             #### RESPONSE TIMEOUT ----------------------------------------------------------------
-            if (mytimer.getTime() > 6):
-                # skip trial
-                stimapr = "None"
+            if (mytimer.getTime() > trial_timing['RT_deadline'][0] ):
                 rt_warning = visual.TextStim(win, text= " רתוי רהמ ביגהל שי", pos=[0,0], color=(-1,-1,-1)) # יש להגיב מהר יותר
                 rt_warning2 = visual.TextStim(win, text= "ךשמהל אוהשלכ שקמ לע ץוחלל שי", pos=[0,-10], color=(-1,-1,-1)) # יש ללחוץ על מקש כלשהוא להמשך
                 rt_warning.draw()
                 rt_warning2.draw()
-
-
                 win.update()
-                dataFile.write("%s, %s, %s, %s, %s, %s,"
-                    % (
-                        subjectN, 
-                        blockType,
-                        current_block, 
-                        [],
-                        t,
-                        "NULL",
-                    ))
+                abort_trial=True
                 while True:
+
                     events = pygame.event.poll()
                     if (events.type == pygame.JOYBUTTONDOWN):
                         # event 4 -> pressing down left button
-                        if (events.button == 4 | events.button == 5):
+                        if events.button == 4:
                             break
                 break
-            events = pygame.event.poll()
+
+            
 
             ##### COLLECT RESPONSE ------------------------------------------------------------------
+            events = pygame.event.poll()
             if (events.type == pygame.JOYBUTTONDOWN):
                 
                 #sub pressed LEFT
@@ -492,116 +485,135 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                     stimapr         = "right"
                     break           
     
-                #choice feedback screen (choice was drawen above)
-                fixation.draw()
-                win.update()
-                core.wait(trial_timing['choice_feedback'][0])
+        #choice feedback screen (choice was drawen above)
+        if abort_trial==False:
+            fixation.draw()
+            win.update()
+            core.wait(trial_timing['choice_feedback'][0])
         
         #### OUTCOME -------------------------------------
-        if (stimapr == "left"):
-            stimL.draw()
-        if (stimapr == "right"):
-            stimR.draw()
-        if (random.random() < prob_chosen):
-            won.draw()
-            coins_per_block+= 1
-            coins_per_task += 1
-            reward          = 1
-        else:
-            lost.draw()
-            reward = 0
-        win.update()
-        core.wait(trial_timing['outcome'][0])
+        if abort_trial==False:
+            if (stimapr == "left"):
+                stimL.draw()
+            if (stimapr == "right"):
+                stimR.draw()
+            if (random.random() < prob_chosen):
+                won.draw()
+                coins_per_block+= 1
+                coins_per_task += 1
+                reward          = 1
+            else:
+                lost.draw()
+                reward = 0
+        if abort_trial==False:
+            win.update()
+            core.wait(trial_timing['outcome'][0])
         
 
         #### THOUGHT PROBE-------------------------------------
-        if (count_to_prob==ntrials_to_prob):   
-            cond = 'probe'       
-            vas.draw()
-            question.draw()
-            pressA.draw()
-            win.flip()
-            mytimer.reset(0)
-            x=50
-            while True:
-                events = pygame.event.poll()
-                #check joystick input
-                # get joysticks axes
-                x=x+j.get_axis(4)
-                if (x>100): x=100
-                if (x<1): x=1
-
-                #print circles according to the joystick, adjusted with the screen size    
-                vas.markerPos=(x)
+        if abort_trial==False:
+            if (count_to_prob==ntrials_to_prob):   
+                cond = 'probe'       
                 vas.draw()
                 question.draw()
                 pressA.draw()
                 win.flip()
+                mytimer.reset(0)
+                x=50
+                while True:
+                    events = pygame.event.poll()
+                    #check joystick input
+                    # get joysticks axes
+                    x=x+j.get_axis(4)
+                    if (x>100): x=100
+                    if (x<1): x=1
 
-                #check to see if the button 'A' in the controller was pressed to stop the program    
-                if(events.type == pygame.JOYBUTTONDOWN):
-                    if(events.button == 0):
-                        RT_vas = mytimer.getTime()
-                        coordinates = x
-                        vas.markerPos=(x)
-                        question.draw()
-                        pressA.draw()
-                        vas.draw()
-                        win.update()                       
-                        core.wait(1)
-                        
-                        
-                        break
+                    #print circles according to the joystick, adjusted with the screen size    
+                    vas.markerPos=(x)
+                    vas.draw()
+                    question.draw()
+                    pressA.draw()
+                    win.flip()
 
-        else:
-            cond = 'no_probe'       
-            coordinates    =-9999
-            RT_vas = -9999
+                    #check to see if the button 'A' in the controller was pressed to stop the program    
+                    if(events.type == pygame.JOYBUTTONDOWN):
+                        if(events.button == 0):
+                            RT_vas = mytimer.getTime()
+                            coordinates = x
+                            vas.markerPos=(x)
+                            question.draw()
+                            pressA.draw()
+                            vas.draw()
+                            win.update()                       
+                            core.wait(1)
+                            
+                            
+                            break
+
+            else:
+                cond = 'no_probe'       
+                coordinates    =-9999
+                RT_vas = -9999
     
             
 
 
     
     #Save data --------------------------------------------------------------------------------------
+        if abort_trial==False:
 
-        #save a line with choice-outcome data
-        dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %f, %f, %f, %f, %f,%f\n" 
+            #save a line with choice-outcome data
+            dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %f, %f, %f, %f, %f,%f,%f,%f,%f,%f\n" 
+                            % (
+                                subjectN,
+                                blockType,
+                                current_block+1,
+                                cond,
+                                t,
+                                chosen+1,  
+                                unchosen+1,
+                                offer[0]+1,
+                                offer[1]+1,
+                                prob_chosen,
+                                prob_unchosen,
+                                stimapr, 
+                                key,     
+                                arms_prob[0],
+                                arms_prob[1], 
+                                arms_prob[2], 
+                                arms_prob[3],
+                                RT,
+                                reward,
+                                coordinates,
+                                RT_vas,
+                                coins_per_block,
+                                coins_per_task,
+                                count_to_prob,
+                                ntrials_to_prob,
+                                trial_timing['ITI'][0],
+                                trial_timing['RT_deadline'][0],
+                                trial_timing['choice_feedback'][0],
+                                trial_timing['outcome'][0]                            
+                            )
+                        )
+            #save a thought probe trial
+            if (count_to_prob == ntrials_to_prob): 
+                
+                #set the next amount of trials to probe
+                ntrials_to_prob= random.randint(2, 3)
+                count_to_prob  = 1
+            else:
+                count_to_prob +=1
+        elif abort_trial==True:
+            dataFile.write("%s, %s, %s, %s, %s\n" 
                         % (
                             subjectN,
                             blockType,
                             current_block+1,
-                            cond,
-                            t,
-                            chosen+1,  
-                            unchosen+1,
-                            offer[0]+1,
-                            offer[1]+1,
-                            prob_chosen,
-                            prob_unchosen,
-                            stimapr, 
-                            key,     
-                            arms_prob[0],
-                            arms_prob[1], 
-                            arms_prob[2], 
-                            arms_prob[3],
-                            RT,
-                            reward,
-                            coordinates,
-                            RT_vas,
-                            coins_per_block,
-                            coins_per_task,
-                            count_to_prob,
-                            ntrials_to_prob                            
+                            'abort',
+                            t
                         )
                     )
-        #save a thought probe trial
-        if (count_to_prob == ntrials_to_prob): 
-            
-            #set the next amount of trials to probe
-            ntrials_to_prob= random.randint(2, 3)
-            count_to_prob  = 1
-        else:
-            count_to_prob +=1
 
 
 main()
