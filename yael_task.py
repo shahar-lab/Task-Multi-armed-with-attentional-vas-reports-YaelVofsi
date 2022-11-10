@@ -16,7 +16,7 @@ import random
 ####set experiment configuration --------------
 
 # number of trials and blocks
-Ntrials          = 3
+Ntrials          = 10
 Nblocks          = 2
 
 #timing in the trial
@@ -24,12 +24,13 @@ trial_timing =  {
   "ITI": [1],
   "RT_deadline": [6],
   "choice_feedback": [0.5],
-  "outcome": [1]
+  "outcome": [1],
+  "vas_deadline": [10]
 }
 
 
 #reward probabilities
-arms_prob   =[0.35,0.45,0.55,0.65]
+arms_prob   =[0.35,0.35,0.65,0.65]
 
 
 #change to True/False to include section in the next run
@@ -52,7 +53,7 @@ fileName = "flowers_task_" + expInfo["subject"] + "_" + data.getDateStr()
 dataFile = open(
     fileName + ".csv", "w"
 )  # a simple text file with 'comma-separated-values'
-dataFile.write("subject, block_type, block, thought probe, trial, chosen, unchosen, offer_right_image, offer_left_image, exp_value_right, exp_value_left, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, RT_vas, coins_per_block, coins_per_task, ntrial_to_prob, count_to_prob,ITI_duration,RT_deadline,choice_feedback_duration,outcome_duration\n")
+dataFile.write("subject, block_type, block, thought probe, trial, chosen, unchosen, offer_left_image, offer_right_image, exp_value_chosen, exp_value_unchosen, choice_location, choice_key, exp_value1, exp_value2, exp_value3, exp_value4, RT, reward, vas, RT_vas, coins_per_block, coins_per_task, count_to_prob, ntrial_to_prob, ITI_duration,RT_deadline,choice_feedback_duration,outcome_duration\n")
 subjectN = expInfo["subject"]
 
 
@@ -183,7 +184,6 @@ def main():
 
         ####BLOCK LOOP--------------------------------
         for current_block in range(Nblocks):
-                print(current_block)
                 
                 #set stim images for current block
                 currSet = picList[current_block]
@@ -396,10 +396,11 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
     coins_per_task+=coins_per_block
 
     #amount of trials to first thought probe
-    ntrials_to_prob=random.randrange(2, 3)
-    count_to_prob  =1
+    ntrials_to_prob=random.randrange(2, 4) #will give you 2 or 3
+    count_to_prob  =1 #count to 2 (2 trials to probe) or 3 (3trials to probe)
 
-
+    print(ntrials_to_prob)
+    print(count_to_prob)
 
 
     ##### TRIAL LOOP -----------------------------------------
@@ -549,21 +550,38 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                             
                             
                             break
+                    #response deadline
+                    if (mytimer.getTime() > trial_timing['vas_deadline'][0] ):
+                        rt_warning = visual.TextStim(win, text= " רתוי רהמ ביגהל שי", pos=[0,0], color=(-1,-1,-1)) # יש להגיב מהר יותר
+                        rt_warning2 = visual.TextStim(win, text= "ךשמהל אוהשלכ שקמ לע ץוחלל שי", pos=[0,-10], color=(-1,-1,-1)) # יש ללחוץ על מקש כלשהוא להמשך
+                        rt_warning.draw()
+                        rt_warning2.draw()
+                        win.update()
+                        abort_probe=True
+                        while True:
+
+                            events = pygame.event.poll()
+                            if (events.type == pygame.JOYBUTTONDOWN):
+                                # event 4 -> pressing down left button
+                                if events.button == 4:
+                                    break
+                        cond         = 'abort_prob'       
+                        coordinates  = ''
+                        RT_vas       = ''
+                        break
 
             else:
                 cond = 'no_probe'       
-                coordinates    =-9999
-                RT_vas = -9999
+                coordinates    = ''
+                RT_vas = ''
     
             
-
-
     
     #Save data --------------------------------------------------------------------------------------
         if abort_trial==False:
 
             #save a line with choice-outcome data
-            dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %f, %f, %f, %f, %f,%f,%f,%f,%f,%f\n" 
+            dataFile.write("%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %f, %f, %f,%f,%f,%f,%f,%f\n" 
                             % (
                                 subjectN,
                                 blockType,
@@ -600,8 +618,9 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
             if (count_to_prob == ntrials_to_prob): 
                 
                 #set the next amount of trials to probe
-                ntrials_to_prob= random.randint(2, 3)
-                count_to_prob  = 1
+                ntrials_to_prob=random.randrange(2, 4) #will give you 2 or 3
+                count_to_prob  =1 #count to 2 (2 trials to probe) or 3 (3trials to probe)
+
             else:
                 count_to_prob +=1
         elif abort_trial==True:
@@ -610,7 +629,7 @@ def mainExperimentModes(dataFile, current_block, subjectN, win, cond, trials, bl
                             subjectN,
                             blockType,
                             current_block+1,
-                            'abort',
+                            'abort_trial',
                             t
                         )
                     )
