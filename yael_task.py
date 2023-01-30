@@ -12,12 +12,13 @@ from random import sample
 import random
 
 
+
 ################################################################################################################
 ####set experiment configuration --------------
 
 # number of trials and blocks
-Ntrials          = 10
-Nblocks          = 2
+Ntrials          = 25
+Nblocks          = 8
 
 #timing in the trial
 trial_timing =  {
@@ -30,13 +31,13 @@ trial_timing =  {
 
 
 #reward probabilities
-arms_prob   =[0.35,0.35,0.65,0.65]
+arms_prob   =[0.3,0.4,0.6,0.7]                                                                                                                                  
 
 
 #change to True/False to include section in the next run
-instructionsPhase = False
-quizPhase         = False
-trainPhase        = False
+instructionsPhase = True
+quizPhase         = True
+trainPhase        = True
 gamePhase         = True
 ############################################################################################################
 
